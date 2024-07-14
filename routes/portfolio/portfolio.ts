@@ -1,9 +1,9 @@
 import { Router } from "express";
 import * as asyncWrapper from 'express-async-handler';
 import { Currency, PortfolioResponse } from './model/PortfolioResponse';
-import models from "../../mongo/mongo";
-import geckoClient from "../../gecko/coingecko";
-import { getRpcInstance } from "../../blockchain/rpc";
+import models from "../../src/mongo/mongo";
+import geckoClient from "../../src/gecko/coingecko";
+import { getRpcInstance } from "../../src/blockchain/rpc";
 
 export const portfolioRouter = Router();
 

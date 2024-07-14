@@ -1,6 +1,6 @@
 import * as express from 'express';
 import * as dotenv from 'dotenv';
-import { connectDb } from './mongo/mongo';
+import { connectDb } from './src/mongo/mongo';
 import { accountRouter } from './routes/account/account';
 import { transactionRouter } from './routes/transaction/transaction';
 import { portfolioRouter } from './routes/portfolio/portfolio';

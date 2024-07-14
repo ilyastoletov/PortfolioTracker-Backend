@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { isCreateTransactionRequest } from "./model/CreateTransactionRequest";
-import models from "../../mongo/mongo";
-import { supportedNetworks } from "../../blockchain/rpc";
-import geckoClient from "../../gecko/coingecko";
+import models from "../../src/mongo/mongo";
+import { supportedNetworks } from "../../src/blockchain/rpc";
+import geckoClient from "../../src/gecko/coingecko";
 import * as asyncWrapper from "express-async-handler";
 
 export const transactionRouter = Router();

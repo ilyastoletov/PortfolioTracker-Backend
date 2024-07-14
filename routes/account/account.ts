@@ -1,9 +1,9 @@
 import { Router, Request, Response } from "express";
 import { isCreateAccountRequest } from "./model/CreateAccountRequest";
-import models from '../../mongo/mongo';
-import { supportedNetworks } from "../../blockchain/rpc";
-import IBlockchainRPC, { getRpcInstance } from "../../blockchain/rpc";
-import geckoClient from "../../gecko/coingecko";
+import models from '../../src/mongo/mongo';
+import { supportedNetworks } from "../../src/blockchain/rpc";
+import IBlockchainRPC, { getRpcInstance } from "../../src/blockchain/rpc";
+import geckoClient from "../../src/gecko/coingecko";
 import * as asyncWrapper from "express-async-handler";
 
 export const accountRouter = Router();
