@@ -1,0 +1,28 @@
+import * as express from 'express';
+import * as dotenv from 'dotenv';
+import { connectDb } from './mongo/mongo';
+import { accountRouter } from './routes/account/account';
+import { transactionRouter } from './routes/transaction/transaction';
+import { portfolioRouter } from './routes/portfolio/portfolio';
+
+dotenv.config();
+
+const app = express();
+app.use(express.json());
+app.use(accountRouter);
+app.use(transactionRouter);
+app.use(portfolioRouter);
+
+app.use((error, req, res, next) => {
+    res.status(500).json(
+        {
+            error: true,
+            message: error.message,
+            stack: error.stack
+        }
+    )
+});
+
+connectDb().then(async () => {
+    app.listen(3000, () => { console.log("App has started on port 3000") });
+});
