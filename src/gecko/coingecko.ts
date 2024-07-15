@@ -7,16 +7,16 @@ class CoinGeckoClient {
     private baseUrl = "https://api.coingecko.com/api/v3/"
 
     async getCurrentPriceUSD(network: string): Promise<Number> {
-        const lowercasedNetwork = network.toLowerCase();
+        const formattedNetworkName = this.mapNetworkNameToID(network);
         const { data, status } = await axios.get<CoinMarketInfoResponse>(
-            this.baseUrl.concat("simple/price/").concat(`?ids=${lowercasedNetwork}&vs_currencies=usd`),
+            this.baseUrl.concat("simple/price/").concat(`?ids=${formattedNetworkName}&vs_currencies=usd`),
             {
                 headers: {
                     "x-cg-demo-api-key": process.env.COINGECKO_API_KEY
                 }
             }
         );
-        return data[lowercasedNetwork].usd;
+        return data[formattedNetworkName].usd;
     }
 
     async isNetworkAvailable(network: string): Promise<Boolean> {
@@ -30,6 +30,17 @@ class CoinGeckoClient {
         );
         const foundNetwork = data.find((v) => { v.name == network });
         return (typeof foundNetwork != undefined);
+    }
+
+    private mapNetworkNameToID(name: string): string {
+        switch(name) {
+            case "Toncoin":
+                return "the-open-network";
+            case "Tether USD":
+                return "tether";
+            default:
+                return name.toLowerCase();
+        }
     }
 
 }

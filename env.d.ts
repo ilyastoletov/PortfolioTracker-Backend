@@ -3,6 +3,7 @@ declare namespace NodeJS {
         DATABASE_URI: string;
         COINGECKO_KEY: string;
         ETH_KEY: string;
+        TON_KEY: string;
         // Add more GetBlock RPC keys here as needed
     }
 }

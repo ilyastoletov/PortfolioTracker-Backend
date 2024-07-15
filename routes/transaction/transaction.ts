@@ -10,14 +10,17 @@ export const transactionRouter = Router();
 transactionRouter.post("/transaction/add", asyncWrapper(async (req, res) => {
     if (!isCreateTransactionRequest(req.body)) {
         res.status(400).send({ error: "Invalid request" });
+        return;
     }
 
     if (!await isAccountExists(req.body.account)) {
         res.status(400).send({ error: `Account with network name ${ req.body.account } does not exist` });
+        return;
     }
 
     if (!isAccountSupportTransactions(req.body.account)) {
         res.status(400).send({ error: `Account with network name ${ req.body.account } is address-tracking one and does not support transactions` })
+        return;
     }
 
     const account = await models.Account.findOne({ network_name: req.body.account });
@@ -27,6 +30,7 @@ transactionRouter.post("/transaction/add", asyncWrapper(async (req, res) => {
         newBalance = performBalanceOperation(account.balance, req.body.amount, !req.body.increase);
     } catch(e) {
         res.status(400).send({ error: "Balance after setting must be greater than 0" });
+        return;
     }
 
     await account.updateOne(
@@ -76,9 +80,10 @@ transactionRouter.get("/transaction/all", asyncWrapper(async (req, res) => {
     res.status(200).send(allTransactions);
 }));
 
-transactionRouter.get("transaction/byNetwork/:networkName", asyncWrapper(async (req, res) => {
+transactionRouter.get("/transaction/byNetwork/:networkName", asyncWrapper(async (req, res) => {
     if (req.params.networkName.length === 0) {
         res.status(400).send({ error: "Network name parameter is empty" });
+        return;
     }
     const filteredTransactions = await models.Transaction.find({ account: req.params.networkName });
     res.status(200).send(filteredTransactions);
