@@ -5,7 +5,7 @@ import { supportedNetworks } from "../../src/blockchain/rpc";
 import IBlockchainRPC, { getRpcInstance } from "../../src/blockchain/rpc";
 import geckoClient from "../../src/gecko/coingecko";
 import * as asyncWrapper from "express-async-handler";
-import { EditAddressRequest, isEditAddressRequest } from "./model/EditAddressRequest";
+import { isEditAddressRequest } from "./model/EditAddressRequest";
 
 export const accountRouter = Router();
 
@@ -49,6 +49,10 @@ async function isAddressValid(network: string, address: string): Promise<Boolean
     const isAddressValid = await rpcInstance.validateAddress(address);
     return isAddressValid; 
 }
+
+accountRouter.get("/account/addressTrackingNetworks", (req, res) => {
+    res.status(200).send(supportedNetworks);
+});
 
 accountRouter.get("/account/availableNetworks", (req, res) => {
     const availableNetworks = ["Bitcoin", "Ethereum", "Solana", "Toncoin", "Avalanche", "Tether USD", "BNB", "XRP", "TRON", "Monero"]
