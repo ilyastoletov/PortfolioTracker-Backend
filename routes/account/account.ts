@@ -20,6 +20,11 @@ accountRouter.post("/account/add", asyncWrapper(async (req: Request, res: Respon
         return;
     }
 
+    if (await isAlreadyExists(req.body.network_name)) {
+        res.status(400).send({ error: "Account with this network name already exists" });
+        return;
+    }
+
     const address = req.body.address;
     if (address != null) {
         if (!isNetworkSupportedForTracking(req.body.network_name)) {
@@ -40,6 +45,11 @@ async function isNetworkSupported(name: string): Promise<Boolean> {
     return geckoClient.isNetworkAvailable(name);
 }
 
+async function isAlreadyExists(name: string): Promise<Boolean> {
+    const foundAccounts = await models.Account.find({ network_name: name });
+    return foundAccounts.length > 0
+}
+
 function isNetworkSupportedForTracking(name: string): boolean {
     return supportedNetworks.indexOf(name) >= 0;
 }
@@ -54,10 +64,20 @@ accountRouter.get("/account/addressTrackingNetworks", (req, res) => {
     res.status(200).send(supportedNetworks);
 });
 
-accountRouter.get("/account/availableNetworks", (req, res) => {
-    const availableNetworks = ["Bitcoin", "Ethereum", "Solana", "Toncoin", "Avalanche", "Tether USD", "BNB", "XRP", "TRON", "Monero"]
+accountRouter.get("/account/availableNetworks", asyncWrapper(async (req, res) => {
+    const allNetworks = ["Bitcoin", "Ethereum", "Solana", "Toncoin", "Avalanche", "Tether USD", "BNB", "XRP", "TRON", "Monero"]
+    const existingNetworkNames = [];
+    (await models.Account.find({})).map(
+        (v) => { existingNetworkNames.push(v.network_name) }
+    );
+    const availableNetworks = [];
+    for (const network of allNetworks) {
+        if (existingNetworkNames.indexOf(network) === -1) {
+            availableNetworks.push(network);
+        }
+    }
     res.status(200).send(availableNetworks);
-});
+}));
 
 accountRouter.patch("/account/editAddress", asyncWrapper(async (req, res) => {
     if (!isEditAddressRequest(req.query)) {
