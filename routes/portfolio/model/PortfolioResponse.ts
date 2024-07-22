@@ -1,7 +1,7 @@
 export type PortfolioResponse = {
     currencies: Currency[],
-    net_worth_usd: Number,
-    net_worth_btc: Number
+    total_usd: Number,
+    total_btc: Number
 };
 
 export type Currency = {

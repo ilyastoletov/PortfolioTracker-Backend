@@ -16,9 +16,7 @@ app.use(portfolioRouter);
 app.use((error, req, res, next) => {
     res.status(500).json(
         {
-            error: true,
-            message: error.message,
-            stack: error.stack
+            error: error.message,
         }
     )
 });

@@ -15,8 +15,8 @@ portfolioRouter.get("/portfolio", asyncWrapper(async (req, res) => {
 
     const response: PortfolioResponse = {
         currencies: currencies,
-        net_worth_usd: netWorthUSD,
-        net_worth_btc: netWorthBTC
+        total_usd: netWorthUSD,
+        total_btc: netWorthBTC
     };
 
     res.status(200).send(response);

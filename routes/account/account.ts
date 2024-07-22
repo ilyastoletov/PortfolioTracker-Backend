@@ -80,20 +80,20 @@ accountRouter.get("/account/availableNetworks", asyncWrapper(async (req, res) =>
 }));
 
 accountRouter.patch("/account/editAddress", asyncWrapper(async (req, res) => {
-    if (!isEditAddressRequest(req.query)) {
+    if (!isEditAddressRequest(req.body)) {
         res.status(400).send({ error: "Specify all required query parameters" });
         return;
     }
-    const account = await models.Account.findOne({ network_name: req.query.account });
+    const account = await models.Account.findOne({ network_name: req.body.account });
     if (account.address === undefined) {
         res.status(400).send({ error: "This account has no address" });
         return;
     }
-    if (!await isAddressValid(String(req.query.account), String(req.query.newAddress))) {
+    if (!await isAddressValid(req.body.account, req.body.newAddress)) {
         res.status(400).send({ error: "New address is not valid" });
         return;
     }
-    await account.updateOne({ address: req.query.newAddress });
+    await account.updateOne({ address: req.body.newAddress });
     res.status(200).send({});
 }));
 
@@ -104,6 +104,10 @@ accountRouter.get("/account/all", asyncWrapper(async (_, res) => {
 
 accountRouter.get("/account/byName/:name", asyncWrapper(async (req, res) => {
     const account = await models.Account.findOne({ network_name: req.params.name });
+    if (account == null) {
+        res.status(404).send({ error: "No such account found" });
+        return;
+    }
     res.status(200).send(account);
 }));
 

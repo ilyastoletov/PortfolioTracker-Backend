@@ -1,25 +1,29 @@
 import IBlockchainRPC from "../rpc";
 import axios from "axios";
-import { GetBalanceResponse } from "./model/GetBalanceResponse";
+import { TonAddressInfo } from "./model/TonAddressInfo";
 
 class TonRPC implements IBlockchainRPC {
     
     private baseUrl = 'https://go.getblock.io/';
 
     async getBalance(address: string): Promise<Number> {
-        const { data, status } = await axios.get<GetBalanceResponse>(
-            this.baseUrl.concat(process.env.TON_KEY).concat("/getAddressBalance?address=").concat(address),
-        );
-        if (status === 200) {
-            return parseInt(data.result) / Math.pow(10, 9);
-        }
+        const data = await this.getAddressInformation(address);
+        return data.result.balance / Math.pow(10, 9);
     }
 
     async validateAddress(address: string): Promise<Boolean> {
-        const { data, status } = await axios.get<GetBalanceResponse>(
-            this.baseUrl.concat(process.env.TON_KEY).concat("/detectAddress?address=").concat(address),
+        const addressInfo = await this.getAddressInformation(address);
+        return addressInfo.ok
+    }
+
+    private async getAddressInformation(address: string): Promise<TonAddressInfo> {
+        const { data, status } = await axios.get<TonAddressInfo>(
+            this.baseUrl.concat(process.env.TON_KEY).concat("/getAddressInformation?address=").concat(address),
         );
-        return data.ok
+        if (data.result.state === "uninitialized") {
+            throw Error("Address is not initialized")
+        };
+        return data
     }
 
 }
