@@ -38,6 +38,11 @@ accountRouter.post("/account/add", asyncWrapper(async (req: Request, res: Respon
     }
     const account = new models.Account(req.body);
     account.save();
+
+    if (address == null) {
+        await createAndSaveInitialTransaction(req.body.network_name, req.body.balance);
+    }
+
     res.status(201).send(account);
 }));
 
@@ -58,6 +63,17 @@ async function isAddressValid(network: string, address: string): Promise<Boolean
     const rpcInstance: IBlockchainRPC = getRpcInstance(network);
     const isAddressValid = await rpcInstance.validateAddress(address);
     return isAddressValid; 
+}
+
+async function createAndSaveInitialTransaction(network: string, amount: number) {
+    const currentBuyPrice = await geckoClient.getCurrentPriceUSD(network);
+    const transaction = new models.Transaction({
+        account: network,
+        amount: amount,
+        increase_balance: true,
+        buy_price_usd: currentBuyPrice as Number
+    });
+    transaction.save();
 }
 
 accountRouter.get("/account/addressTrackingNetworks", (req, res) => {
