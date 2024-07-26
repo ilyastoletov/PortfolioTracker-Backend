@@ -14,6 +14,7 @@ app.use(transactionRouter);
 app.use(portfolioRouter);
 
 app.use((error, req, res, next) => {
+    console.log(error.stack);
     res.status(500).json(
         {
             error: error.message,

@@ -81,7 +81,12 @@ accountRouter.get("/account/addressTrackingNetworks", (req, res) => {
 });
 
 accountRouter.get("/account/availableNetworks", asyncWrapper(async (req, res) => {
-    const allNetworks = ["Bitcoin", "Ethereum", "Solana", "Toncoin", "Avalanche", "Tether USD", "BNB", "XRP", "TRON", "Monero"]
+    const allNetworks = ["Bitcoin", "Ethereum", "Solana", "Toncoin", "Avalanche (С-chain)", "Tether USD", "BNB", "Ripple", "Tron", "Monero", "Polygon"]
+    const availableNetworks = await excludeExistingNetworks(allNetworks);
+    res.status(200).send(availableNetworks);
+}));
+
+async function excludeExistingNetworks(allNetworks: string[]): Promise<String[]> {
     const existingNetworkNames = [];
     (await models.Account.find({})).map(
         (v) => { existingNetworkNames.push(v.network_name) }
@@ -92,8 +97,8 @@ accountRouter.get("/account/availableNetworks", asyncWrapper(async (req, res) =>
             availableNetworks.push(network);
         }
     }
-    res.status(200).send(availableNetworks);
-}));
+    return availableNetworks;
+}
 
 accountRouter.patch("/account/editAddress", asyncWrapper(async (req, res) => {
     if (!isEditAddressRequest(req.body)) {

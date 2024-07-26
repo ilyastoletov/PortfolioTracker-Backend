@@ -1,19 +1,20 @@
 import { isAddress } from "web3-validator";
 import IBlockchainRPC from "../rpc";
-import axios from "axios";
-import { GetBalanceResponse } from "./model/GetBalanceResponse";
-import { fromHexadecimalToDecimal } from "../util/eth_like";
 import { rpcMethodCall } from "../model/RpcRequest";
+import { fromHexadecimalToDecimal } from "../util/eth_like";
+import axios from "axios";
+import { GetBalanceResponse } from "../eth/model/GetBalanceResponse";
 
-export class EthereumRPC implements IBlockchainRPC {
+export class PolygonRPC implements IBlockchainRPC {
 
     async getBalance(address: String): Promise<Number> {
-        const requestBody = rpcMethodCall('eth_getBalance', [address as string, 'latest']);
+        const body = rpcMethodCall('eth_getBalance', [address as string, 'latest']);
+        const url = 'https://go.getblock.io/'.concat(process.env.MATIC_KEY).concat("/")
         const { data, status } = await axios.post<GetBalanceResponse>(
-            "https://go.getblock.io/".concat(process.env.ETH_KEY), JSON.stringify(requestBody),
+            url, body,
             {
                 headers: {
-                    'Content-Type': "application/json"
+                    'Content-Type': 'application/json'
                 }
             }
         )

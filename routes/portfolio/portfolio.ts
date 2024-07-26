@@ -22,22 +22,19 @@ portfolioRouter.get("/portfolio", asyncWrapper(async (req, res) => {
     res.status(200).send(response);
 }));
 
-async function getPricesUsd(): Promise<Number[]> {
-    const prices: number[] = [];
+async function getPricesUsd(): Promise<Map<String, Number>> {
     const accounts = await models.Account.find({});
-    for (const account of accounts) {
-        const priceUSD = await geckoClient.getCurrentPriceUSD(account.network_name);
-        prices.push(priceUSD as number);
-    }
+    const accountNetworkNames = accounts.map((v) => { return v.network_name });
+    const prices = await geckoClient.getMultiplePricesUSD(accountNetworkNames);
     return prices;
 }
 
-async function getCurrencies(pricesUSD: Number[]): Promise<Currency[]> {
+async function getCurrencies(pricesUSD: Map<String, Number>): Promise<Currency[]> {
     const accounts = await models.Account.find({});
     const currencies: Currency[] = [];
     for (let i = 0; i < accounts.length; i++) {
         const account = accounts[i];
-        const priceUSD = pricesUSD[i];
+        const priceUSD = pricesUSD.get(account.network_name);
         const balance = await getAccountBalance(account.network_name, account.balance, account.address);
         const balanceUSD = (balance as number) * (priceUSD as number);
         const formattedBalanceUSD = Number(balanceUSD.toFixed(2));
@@ -69,12 +66,12 @@ async function getBalanceRPC(network_name: string, address: string): Promise<Num
     return balance;
 }
 
-async function calculateNetWorthUSD(prices: Number[]): Promise<Number> {
+async function calculateNetWorthUSD(prices: Map<String, Number>): Promise<Number> {
     const accounts = await models.Account.find({});
     let worth: number = 0;
     for (let i = 0; i < accounts.length; i++) {
         const account = accounts[i];
-        const priceUSD = prices[i] as number;
+        const priceUSD = prices.get(account.network_name) as number;
         const balance = await getAccountBalance(account.network_name, account.balance, account.address) as number;
         worth += (balance * priceUSD);
     }

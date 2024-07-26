@@ -2,7 +2,7 @@ import IBlockchainRPC from "../rpc";
 import axios from "axios";
 import { TonAddressInfo } from "./model/TonAddressInfo";
 
-class TonRPC implements IBlockchainRPC {
+export class TonRPC implements IBlockchainRPC {
     
     private baseUrl = 'https://go.getblock.io/';
 
@@ -27,7 +27,3 @@ class TonRPC implements IBlockchainRPC {
     }
 
 }
-
-const tonRPCClient = new TonRPC();
-
-export default tonRPCClient;
